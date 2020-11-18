@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<input type="file" id="upload" multiple>
+
+<p id="demo"></p>
+
+<script>
+document.getElementById('upload').addEventListener('change', readFileAsString);
+
+function readFileAsString() {
+    var files = this.files;
+    var erg = "";
+    
+    if (files.length === 0) {
+        console.log('No file is selected');
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(event) {
+    erg = event.target.result;
+       document.write(erg);
+    };
+   reader.readAsText(files[0]);
+  return erg;
+}
+
+var inp = readFileAsString();
+
+
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<input type="file" onchange="readFile(this)">
+<button onclick="download()">Download</button>
+
+<textarea id="demo"></textarea>
+
+<script>
+
+
+function readFile(input) {
+
+  let file = input.files[0];
+
+  let reader = new FileReader();
+
+  reader.readAsText(file);
+
+  reader.onload = function() {
+  document.getElementById('demo').value = reader.result;   
+  };
+
+  reader.onerror = function() {
+    alert(reader.error);
+  };
+ 
+}
+
+
+function download() {
+
+let filename = "react";
+let text = document.getElementById('demo').value;
+let element = document.createElement('a');
+
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+</script>
+
+</body>
+</html>

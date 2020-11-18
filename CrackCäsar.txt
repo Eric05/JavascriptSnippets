@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<body>
+<head>
+<style>
+body {
+ background-image: linear-gradient(black,darkgrey);
+ padding:5%;
+ font-family:'verdana';
+ font-size:14px;
+}
+h2 {
+color:coral;
+text-align:center;
+text-decoration:overline;
+font-size:28px;
+}
+div {
+border: 1px solid coral;
+color:silver;
+padding:5%;
+}
+#output {
+border: 1px solid coral;
+color:silver;
+min-height:400px;
+padding:5%;
+}
+button {
+color:coral;
+padding: 2%;
+}
+input {
+width:50%;
+background: black;
+color:white;
+padding:2%;
+}
+p {
+color:silver;
+
+}
+</style>
+</head>
+
+<h2>Crack Cäsar</h2>
+<div>
+<p>Enter your phrase. <br>Use 'oe' instead of 'ö'. <br>All no alphabetic Chars will be replaced by '*'</p>
+<input id="inp" value="xfs jtu efs cftuf"/> <button onclick="crack()">Crack</button>
+<button onclick="clearIt()">Clear</button>
+</div>
+<p id="demo"></p>
+
+<p id ="output"> </p>
+
+<script>
+
+function clearIt(){
+document.getElementById("inp").value = "";
+document.getElementById("output").innerHTML = "";
+
+}
+
+class combo {
+
+ constructor(text, prob, prob2) {
+    this.text = text;
+    this.prob = prob;
+    }
+}
+
+function moveChar( offset, char) {
+
+   if ( char == " ") { return " ";} 
+   if ( char == "*") { return "*";} 
+    var n = char.charCodeAt(0) - 'a'.charCodeAt();
+    n = (n + offset) % 26; 
+    
+    return String.fromCharCode(n + 'a'.charCodeAt());
+
+}
+
+function encString(str,offset) {
+
+var arr = str.split('');
+var erg = arr.map(moveChar.bind(null,offset));
+var encStr = erg.join('');
+return encStr;
+}
+
+function orderArr(list) {
+var sorted = Object.keys(list).sort(function(a,b){return list[a]-list[b]});
+return sorted;
+}
+
+function generateArrWithProb(str) {
+
+var arr = [];
+
+for( var i = 0; i < 26; i++) {
+decStr = encString(str,i);
+prob = checkProbability(decStr);
+c = new combo(decStr,prob);
+arr.push(c);
+}
+
+return arr;
+}
+
+// ------------ probability ---------------------
+function sortProb(arr){
+var tmp;
+
+for(var i = 0; i < arr.length; i++) {
+ for (var j = 0; j < arr.length-1; j++){
+	 if (letter(arr[j].text) < letter(arr[j+1].text)) {
+     tmp = arr[j];
+     arr[j] = arr[j+1];
+     arr[j+1] = tmp;
+     }
+ }
+ }
+ 
+ arr[1].prob -=1;
+
+arr[2].prob -=2;
+
+for (var k = 3; k < arr.length; k++) {
+arr[k].prob -=3;
+}
+}
+
+function letter(str){
+var arr = str.split('');
+var rex = /[ainsr]/;
+var counter = 0;
+
+for(var i = 0; i < arr.length; i++) {
+if(arr[i] == 'e') { counter += 2; }
+if(arr[i].match(rex)) { counter += 1;}
+ }
+ return counter;
+}
+
+function checkProbability(str){
+ count = 10;
+
+var check1 = checkVocals(str);
+var check2 = checkConsonants(str);
+
+return count - check1 - check2 ;
+}
+
+function checkConsonants(str) {
+var arr = str.split(" ");
+var rex = /[bcdfghjklmnpqrstvwxyz]/;
+counter = 0;
+
+for (a in arr) {
+ if(!rex.test(arr[a])) {
+ counter += 2;
+ }
+}
+return counter;
+}
+
+function checkVocals(str) {
+var arr = str.split(" ");
+var rex = /[aeiou]/;
+counter = 0;
+
+for (a in arr) {
+
+ if(!rex.test(arr[a])) {
+ counter += 2;
+ }
+}
+return counter;
+}
+
+function compare(a, b) {
+ 
+  const A = a.prob;
+  const B = b.prob;
+
+  let comparison = 0;
+  if (A < B) {
+    comparison = 1;
+  } else if (A > B) {
+    comparison = -1;
+  }
+  return comparison;
+}
+
+function printOutput(sorted){
+
+var erg = "";
+var prob="";
+for(var i = 0; i < sorted.length; i++) {
+
+if(i > 0) {
+prob = "";
+if(sorted[i].prob != sorted[i-1].prob) {
+ for( var j = 0; j < sorted[i].prob; j++) {
+ prob += '+';
+ }
+erg += '<br><b> [ ' +  prob + ' ]' + "</b><br>";
+}
+
+}
+
+erg += sorted[i].text + '<br> ';
+}
+return '<b>Probability [ ++++++++++ ]</b><br>' + erg;
+}
+
+function clearString(str){
+var clr = str.rep
+}
+
+function clearString(str){
+var lower = str.toLowerCase();
+var rex =/[^a-z ]/g;
+var clearString = lower.replace(rex,'*');
+return clearString;
+}
+
+function crack(){
+var str = clearString(document.getElementById("inp").value);
+var arr = generateArrWithProb(str);
+
+ sortProb(arr);
+ console.log(arr);
+var sorted = arr.sort(compare);
+var erg = printOutput(sorted);
+document.getElementById("output").innerHTML = erg;
+}
+
+</script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,43 @@
+<script>
+
+function getIndex(){
+
+let date = new Date();
+let day = date.getDate();
+let month = date.getMonth()+1;
+
+let index = 100 * month + day;
+return index;
+}
+
+function getSeason(){
+
+let index = getIndex();
+
+if (index > 321 && index < 621) {
+return 'spring';
+}
+if (index > 621 && index < 921){
+return 'summer';
+}
+if (index > 921 && index < 1221){
+return 'autumn';
+}
+return 'winter';
+}
+
+console.log( getSeason());
+</script>
+
+
+----------------------------------------
+if (index > 321 && index < 821) {
+document.getElementById('header').innerHTML = 'summer';
+document.getElementById('text').innerHTML = 'summer in schröcken';
+document.getElementById('myImage').src='pic_bulbon.gif';
+}
+if (index > 7621 && index < 921){
+document.getElementById('header').innerHTML = 'winter';
+document.getElementById('text').innerHTML = 'winter in schröcken';
+document.getElementById('myImage').src='pic_bulboff.gif';
+}

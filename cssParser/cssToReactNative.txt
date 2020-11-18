@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Css-Parser: Convert Css to React Native usable Code</h2>
+<p id="demo"></p>
+
+<script>
+
+function splitPropertyAndValue(str){
+var arr = [];
+
+var pos = str.indexOf(':') + 1;
+var property = str.slice(0, pos);
+var val = (str.slice(pos,str.length));
+
+arr.push(property);
+arr.push(val);
+
+return arr;
+}
+
+function changeDashToCaptial(str) {
+var erg;
+
+if ( str.includes('-')) {
+var pos = str.indexOf('-') + 1;
+var str1 = str.slice(0, pos);
+var str2 = (str.slice(pos,str.length));
+var capStr2 = capitalizeFirstLetter(str2);
+
+erg = (str1 + capStr2).replace('-','');
+} else {
+ erg = str;
+}
+return erg;
+}
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function surroundWithSingleQuote(str){
+var erg = "";
+
+if(isNaN(str)) {
+erg = " '"+ str.trim() + "'";
+} else {
+erg = str;
+}
+return erg;
+}
+
+function cssToReactNative(str) {
+
+var keyVal = splitPropertyAndValue(str);
+var str1 = changeDashToCaptial(keyVal[0]);
+var str2 = surroundWithSingleQuote(keyVal[1]);
+
+return str1 + str2;
+}
+
+function changeElem(str,name){
+var arr = (str.trim()).split(';');
+
+var elem = arr.map(cssToReactNative);
+var erg = elem.join(",<br>");
+var cleanErg = erg.substring(0,erg.length-5);
+var output = name.trim() + ": {<br>" + cleanErg + "<br>}"
+
+return output;
+}
+
+function splitSelectorAndDeclaration(str){
+var rex = /[{}]/;
+var arr = str.split(rex);
+
+var assoc = [];
+
+for( i = 0; i < arr.length-1; i += 2) {
+var obj = {key: arr[i], val: arr[i+1]};
+assoc.push(obj);
+}
+return assoc;
+}
+
+function createOutput(arr){
+var inp = splitSelectorAndDeclaration(text);
+var output = "";
+
+for( i = 0; i < inp.length; i++) {
+
+output += changeElem(inp[i].val,inp[i].key)  + ',<br>';
+}
+var erg =  "const styles = StyleSheet.create({<br>" + output.slice(0,-5) + "<br>})";
+return erg;
+}
+
+text = " body {color: redblue; background-image: url(poker.jpg);    background-size: auto;     background-repeat: no-repeat; font-size: 30;  background-attachment: fixed;  background-position: right center;  width: 10%;  background-color: #eee;  color: #444; background:blue;} div { width: 100%;  background-color: #eee;} p {font-size: bold;}"
+
+document.getElementById("demo").innerHTML= createOutput(text);
+
+
+</script>
+
+
+</body>
+</html>
+
+
+

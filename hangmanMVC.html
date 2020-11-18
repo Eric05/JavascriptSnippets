@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <head>
+        <title>Font Awesome Icons</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+        <!--Get your own code at fontawesome.com-->
+
+        <style>
+            body {
+                background-color: darkgrey;
+                color: white;
+                padding: 5%;
+                font-family: 'arial';
+                text-align: center;
+            }
+
+            div {
+                padding: 3%;
+                border-bottom: 2px solid white;
+            }
+
+            #inpu {
+                padding: 2%;
+                margin-top: 2%;
+            }
+
+            #wrapper {
+                background-color: navy;
+                max-width: 500px;
+                min-height: 500px;
+                padding: 15px;
+                box-shadow: 2px 2px 6px black;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <h1> Guess the Word </h1>
+        <div id="wrapper">
+
+            <div>
+                <p id="iconID" />
+            </div>
+            <div>
+                <h2 id="demo">JavaScript Strings</h2>
+            </div>
+            <div>
+                <br>
+                Make your Guess: <br>
+                <input oninput="checkGuess()" id="inpu" autofocus>
+                <br><br>
+            </div>
+            <div>
+                <p id="guessed">JavaScript Strings</p>
+            </div>
+        </div>
+        <script>
+
+            const GameState = {
+                RUNNNING: 'RUNNNING',
+                GAME_OVER: 'GAME_OVER',
+                GAME_WON: 'GAME_WON'
+            }
+
+            class Generator {
+
+
+                static words = "ich du wir ziele muhle kuehler banane apfel hexe Mensch Kunst Lied spieler schlaf tod leben ananas frau Der hatte ganz gerne frischen Dorsch tauchte schwamm den Fischen hinterher doch leider blieben seine Hunde immer leer Irgendwann war der kleine Frosch und wollte nicht mehr den ollen Fischen hinterherjagen suchte sich ein neues Spiel aus Als gerade viele auf dem Teich schwammen kam ihm die Idee mit dem wollte von einem Seerosenblatt auf das andere Das war aber gar nicht so einfach einen kleinen Frosch Es brauchte Mut und Kraft So der kleine Frosch zuerst mit die ganz dicht aneinander auf dem Wasser lagen Denn so war er sicher dass er sie mag und nicht ins Wasser plumpste Er also ganz von einem Blatt aufs andere pfiff dazu und hatte seinen Spass Die waren ja nah und es ging ganz leicht Bald wurde das aber dem kleinen Frosch zu langweilig und";
+              
+
+                static generateWord() {
+
+                    const arr = Generator.words.split(' ');
+                    if(arr.length <= 1) {
+                        return arr[0].toUpperCase();
+                    }
+                    const rand = Math.floor(Math.random() * (arr.length - 1) ) + 1 ;
+
+                    return arr[rand].toUpperCase();
+                }
+            }
+
+            class HangmanModel {
+
+                constructor(placeHolder = '_') {
+                    this.placeHolder = placeHolder;
+                    this.wordToGuess = Generator.generateWord();
+                    this.guessedChars = new Set();
+                    this.currentGuessedWord = this.getWordWithPlaceHolders();
+                    this.currentTry = 5;
+                    this.allGuessedChars = new Set();
+                }
+
+                getWordWithPlaceHolders() {
+                    let result = "";
+                    for (const char of this.wordToGuess) {
+                        if (this.guessedChars.has(char)) {
+                            result += char;
+                        } else {
+                            result += this.placeHolder;
+                        }
+                    }
+                    return result;
+
+                }
+
+                guessChar(char) {
+
+                    this.allGuessedChars.add(char.toUpperCase());
+
+                    if (this.wordToGuess.includes(char)) {
+                        this.guessedChars.add(char.toUpperCase());
+                    } else {
+                        this.currentTry--;
+                    }
+                }
+
+                countScore(str, chars) {
+                    let counter = 0;
+                    for (let s of str) {
+                        if (chars.has(s)) {
+                            counter++;
+                        }
+
+                        if (counter == str.length) {
+                            return true;
+                        }
+                    }
+                }
+
+                getGameStatus() {
+                    if (this.countScore(this.wordToGuess, this.guessedChars)) {
+
+                        return GameState.GAME_WON;
+                    }
+                    if (this.currentTry <= 0) {
+                        return GameState.GAME_OVER;
+                    }
+                    return GameState.RUNNNING;
+                }
+            }
+
+            class HangmanController {
+
+                constructor() {
+                    this.hangmanModel = new HangmanModel();
+                }
+
+                handleCharInput(char) {
+                    this.hangmanModel.guessChar(char);
+                }
+
+                handleGetCurrentGuessedWord() {
+                    return this.hangmanModel.getWordWithPlaceHolders();
+                }
+
+                getCurrentGameStatus() {
+                    return this.hangmanModel.getGameStatus();
+                }
+
+                getCurrentTry() {
+                    return this.hangmanModel.currentTry;
+                }
+
+                getAllGuessedChars() {
+                    return this.hangmanModel.allGuessedChars;
+                }
+
+                getWordToGuess() {
+                    return this.hangmanModel.wordToGuess;
+                }
+            }
+
+
+
+
+            function checkGuess() {
+
+                const inp = document.getElementById("inpu").value.toUpperCase();
+                controller.handleCharInput(inp);
+                document.getElementById("inpu").value = '';
+
+                const currentGuessedWord = controller.handleGetCurrentGuessedWord();
+
+                document.getElementById("guessed").innerHTML = printGuessed(controller.getAllGuessedChars());
+                document.getElementById("demo").innerHTML = printStr(currentGuessedWord);
+
+                const gameState = controller.getCurrentGameStatus();
+
+                if (gameState === GameState.GAME_WON) {
+                    alert("you won! Well done");
+                    location.reload();
+                } else if (gameState === GameState.GAME_OVER) {
+                    alert("you lost! Word was " + controller.getWordToGuess());
+                    location.reload();
+                }
+                printLives(controller.getCurrentTry());
+            }
+
+
+            function printStr(str) {
+                let erg = '';
+
+                for (s of str) {
+                    erg += s.toUpperCase() + ' ';
+                }
+
+                return erg;
+            }
+
+            function printGuessed(guessed) {
+                let erg = "";
+                for (let g of guessed) {
+                    erg += g + ',';
+                }
+                return 'Guessed: [ ' + erg + ' ]';
+            }
+
+            function printLives(max) {
+                let lives = document.getElementById("iconID");
+                let erg = "";
+                for (var i = 0; i < max; i++) {
+                    erg += '  ' + "<i class='fas fa-file' style='font-size:25px;color:coral;'i>";
+                }
+                lives.innerHTML = erg;
+            }
+
+            function init() {
+                printLives(controller.getCurrentTry());
+
+                document.getElementById("guessed").innerHTML = printGuessed(controller.getAllGuessedChars());
+                document.getElementById("demo").innerHTML = printStr(controller.handleGetCurrentGuessedWord());
+            }
+
+
+            function startGame() {
+                return new HangmanController();
+            }
+            const controller = startGame();
+            init();
+
+
+        </script>
+
+    </body>
+
+</html>
